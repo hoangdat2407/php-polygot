@@ -102,7 +102,7 @@ function generate_polyglot($phar, $jpeg){
 // $object->out = 'Hallo World';
 
 $object = new CustomTemplate(new Blog("abc","Hello"));
-
+var_dump(serialize($object));
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
