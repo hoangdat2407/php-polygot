@@ -104,7 +104,7 @@ function generate_polyglot($phar, $jpeg){
 
 // $object = new CustomTemplate($blog);
 $object = new CustomTemplate;
-$blog = new Blog;
+$blog = new Blog("abc","abc");
 $blog->desc = "{{7*7}}";
 $blog->user = 'user';
 $object->template_file_path = $blog;
