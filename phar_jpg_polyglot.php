@@ -110,7 +110,7 @@ $object = new CustomTemplate(new Blog("abc","Hello"));
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
-$outfile = 'out1.jpg';
+$outfile = 'out.jpg';
 $payload = $object;
 $prefix = '';
 
